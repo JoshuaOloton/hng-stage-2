@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/03d986c6-8708-4eb5-8a4a-f63df567ab4e/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/hng-stage-1",
+    "appService.deploySubpath": "."
+}
