@@ -13,9 +13,9 @@ app = create_app()
 
 @app.route('/')
 def home():
-    return 'HNG11 Backend Track Stage 1!'
+    return 'HNG11 Backend Track Stage 2!'
 
 if __name__ == '__main__':
-    # app.run(debug=True, port=3000)
+    app.run(debug=True, port=3000)
     # serve(app, host='127.0.0.1', port=8080)
-    serve(TransLogger(app, setup_console_handler=False), host='127.0.0.1')
+    # serve(TransLogger(app, setup_console_handler=False), host='127.0.0.1')

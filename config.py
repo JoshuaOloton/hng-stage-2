@@ -1,13 +1,12 @@
-import os
+from os import environ
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    # SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = environ.get('SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
-    # SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
 
 
 class ProductionConfig(Config):
