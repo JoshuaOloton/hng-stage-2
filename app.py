@@ -37,4 +37,4 @@ def drop_db():
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
     # serve(app, host='127.0.0.1', port=8080)
-    # serve(TransLogger(app, setup_console_handler=False), host='127.0.0.1')
+    serve(TransLogger(app, setup_console_handler=False), host='0.0.0.0')
