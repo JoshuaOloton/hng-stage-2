@@ -3,6 +3,7 @@ from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import Organisation, User
 from api import db
+import uuid
 
 
 @organisations.route('/organisations', methods=['GET'])
@@ -28,13 +29,15 @@ def get_orgs():
             "statusCode": "500"
         }), 400
     
-@organisations.route('/organisations/<int:id>', methods=['GET'])
+
+# get a single organisation record for a logged in user
+@organisations.route('/organisations/<orgId>', methods=['GET'])
 @jwt_required()
-def get_org(id):
+def get_org(orgId):
     try:
         # get current logged in user
         current_user = User.query.filter_by(email=get_jwt_identity()).first()
-        org = Organisation.query.get(id)
+        org = Organisation.query.get(orgId)
 
         # Check if current user is authorized to access the organization
         if org not in current_user.organisations:
@@ -60,6 +63,7 @@ def get_org(id):
         }), 400
     
 
+# create a new organisation
 @organisations.route('/organisations', methods=['POST'])
 @jwt_required()
 def post_org():
@@ -81,7 +85,16 @@ def post_org():
 
         # get current logged in user
         current_user = User.query.filter_by(email=get_jwt_identity()).first()
-        organisation = Organisation(name=name, description=description)
+
+        orgid = str(uuid.uuid4())
+        while Organisation.query.get(orgid):
+            orgid = str(uuid.uuid4())  # ensure orgid is unique
+
+        organisation = Organisation(
+            orgId = orgid,
+            name=name, 
+            description=description
+        )
 
         current_user.organisations.append(organisation)
 
@@ -103,8 +116,8 @@ def post_org():
             "statusCode": 400
         }), 400
 
-
-@organisations.route('/organisations/<int:orgId>/users', methods=['POST'])
+# add user to a particular organisation
+@organisations.route('/organisations/<orgId>/users', methods=['POST'])
 @jwt_required()
 def add_user_to_org(orgId):
     try:
@@ -123,7 +136,12 @@ def add_user_to_org(orgId):
                }
                }), 422
 
-        user = User.query.get(int(userId))
+        user = User.query.get(userId)
+        if user is None:
+            return jsonify({
+                "message": "User not found"
+            }), 404
+        
         user.organisations.append(organisation)
 
         db.session.commit()

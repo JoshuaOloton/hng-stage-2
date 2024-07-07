@@ -4,7 +4,11 @@ from api.models import User, Organisation
 from api import bcrypt, db
 from api.utils import validate_auth_fields
 from flask_jwt_extended import create_access_token
-import sqlalchemy
+from datetime import timedelta
+import uuid
+
+
+expiration_delta = timedelta(minutes=15)
 
 @auth.route('/login', methods=['POST'])
 def login():
@@ -12,10 +16,8 @@ def login():
         if not request.data:
             return jsonify({"error": "Request must be non-empty JSON"}), 400
 
-        email = request.json['email']
-        password = request.json['password']
-        print('Email: ', email)
-        print('Password: ', password)
+        email = request.json.get('email')
+        password = request.json.get('password')
 
         if not email or not password:
             return jsonify({'error': 'Missing field'})
@@ -23,12 +25,12 @@ def login():
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user and existing_user.verify_password(password):
-            access_token = create_access_token(identity=email,)
+            access_token = create_access_token(identity=email, expires_delta=expiration_delta)
             return jsonify({
                 "status": "success",
                 "message": "Login successful",
                 "data": {
-                    "access_token": access_token,
+                    "accessToken": access_token,
                     "user": existing_user.to_json()
                 }
             }), 200
@@ -63,7 +65,12 @@ def register():
 
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8') # hash password before storing in db
 
+        userid = str(uuid.uuid4())
+        while User.query.get(userid):
+            userid = str(uuid.uuid4())  # ensure userId is unique
+
         user = User(
+            userId=userid,
             firstName=firstName.capitalize(), 
             lastName=lastName,
             email=email,
@@ -72,10 +79,15 @@ def register():
         )
 
         # once user is registered, create an access token for immediate login
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(identity=email, expires_delta=expiration_delta)
 
         # create an organisation for the user
+        orgid = str(uuid.uuid4())
+        while Organisation.query.get(orgid):
+            orgid = str(uuid.uuid4())  # ensure orgid is unique
+
         organisation = Organisation(
+            orgId = orgid,
             name= f'{firstName.capitalize()}\'s Organisation',
         )
         user.organisations.append(organisation)
@@ -86,27 +98,14 @@ def register():
 
         return jsonify({
             "status": "success",
-            "message": "Login successful",
+            "message": "Registration successful",
             "data": {
-                "access_token": access_token,
+                "accessToken": access_token,
                 "user": user.to_json()
             }
             }), 201
 
         # return jsonify(user.to_json()), 201
-
-    except sqlalchemy.exc.IntegrityError as e:
-        errorInfo = e.orig.args
-        print('ErrorInfo')  #This will give you error code
-        print(errorInfo)  #This will give you error code
-        print(e)
-        # print(errorInfo[1])
-        # print(e.orig.diag.message_detail) 
-        return jsonify({
-            "status": "Bad request",
-            "message": f"{e}",
-            "statusCode": "400"
-        }), 400
 
     except Exception:
         return jsonify({
@@ -114,7 +113,3 @@ def register():
             "message": "Registration unsuccessful",
             "statusCode": "400"
         }), 400
-
-@auth.route('/logout')
-def logout():
-    return jsonify({'message': 'Logout route works!'})

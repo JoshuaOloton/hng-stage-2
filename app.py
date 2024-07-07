@@ -11,7 +11,7 @@ logger = logging.getLogger('waitress')
 logger.setLevel(logging.INFO)
 
 load_dotenv()
-app = create_app()
+app = create_app('production')
 
 @app.route('/')
 def home():

@@ -2,7 +2,7 @@ from api import db, bcrypt
 
 class User(db.Model):
     __tablename__ = 'users'
-    userId = db.Column(db.Integer, primary_key=True, unique=True)
+    userId = db.Column(db.String(256), primary_key=True, unique=True)
     firstName = db.Column(db.String(50), nullable=False)
     lastName = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -20,6 +20,10 @@ class User(db.Model):
 
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
+    
+    def has_common_organisation(self, user):
+        """Check if this user has any common organisation with another user."""
+        return any(org in user.organisations for org in self.organisations)
 
     def to_json(self):
         return {
@@ -36,13 +40,13 @@ class User(db.Model):
 
 class Organisation(db.Model):
     __tablename__ = 'organisations'
-    orgId = db.Column(db.Integer, primary_key=True, unique=True)
+    orgId = db.Column(db.String(256), primary_key=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255))
 
     def to_json(self):
         return {
-            "orgId": str(self.orgId),
+            "orgId": self.orgId,
             "name": self.name,
             "description": self.description
         }
@@ -52,6 +56,6 @@ class Organisation(db.Model):
 
 
 user_organisations = db.Table('user_organisations',
-    db.Column('userId', db.Integer, db.ForeignKey('users.userId')),
-    db.Column('orgId', db.Integer, db.ForeignKey('organisations.orgId'))
+    db.Column('userId', db.String(256), db.ForeignKey('users.userId')),
+    db.Column('orgId', db.String(256), db.ForeignKey('organisations.orgId'))
 )

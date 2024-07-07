@@ -19,7 +19,7 @@ def validate_auth_fields(json_body):
     if  User.query.filter_by(email=json_body.get('email')).first():
         errors.append({
             "field": "email",
-            "message": "Email must be unique"
+            "message": "email must be unique"
         })
 
     return errors
