@@ -8,6 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     phone = db.Column(db.String(15))
+    organisations = db.relationship('Organisation', secondary='user_organisations', backref=db.backref('users', lazy='dynamic'))
 
     @property
     def password(self):
@@ -20,25 +21,37 @@ class User(db.Model):
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
 
-    def to_dict(self):
+    def to_json(self):
         return {
-            'userId': self.userId,
-            'firstName': self.firstName,
-            'lastName': self.lastName,
-            'email': self.email,
-            'password': self.password_hash,
-            'phone': self.phone
+            "userId": self.userId,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "email": self.email,
+            "phone": self.phone
         }
     
     def __repr__(self) -> str:
         return f'<User {self.userId} -> {self.firstName}>'
 
 
-class Organization(db.Model):
-    __tablename__ = 'organizations'
-    orgID = db.Column(db.Integer, primary_key=True, unique=True)
+class Organisation(db.Model):
+    __tablename__ = 'organisations'
+    orgId = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255))
 
+    def to_json(self):
+        return {
+            "orgId": str(self.orgId),
+            "name": self.name,
+            "description": self.description
+        }
+
     def __repr__(self) -> str:
-        return f'<Organization -> {self.name}>'
+        return f'<Organisation -> {self.name}>'
+
+
+user_organisations = db.Table('user_organisations',
+    db.Column('userId', db.Integer, db.ForeignKey('users.userId')),
+    db.Column('orgId', db.Integer, db.ForeignKey('organisations.orgId'))
+)

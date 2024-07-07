@@ -20,8 +20,15 @@ def create_app(config_name='default'):
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/api')
 
-    # Add your app configuration and routes here
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint, url_prefix='/api')
+
+    from .organisations import organisations as orgs_blueprint
+    app.register_blueprint(orgs_blueprint, url_prefix='/api')
+
+    from .users import users as users_blueprint
+    app.register_blueprint(users_blueprint, url_prefix='/api')
+
+    app.json.sort_keys = False
 
     return app
