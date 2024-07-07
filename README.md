@@ -1,27 +1,268 @@
-# Flask Weather Greeting App
+# HNG STAGE 2 TASK
 
-This Flask application greets visitors based on their provided name (extracted from query parameters), retrieves their IP address, and fetches current weather information using the WeatherAPI.
+This project provides authentication endpoints for user registration and login. The API is built using Flask and includes user validation, password hashing, and JWT token generation.
 
-## Features
+## Endpoints
 
-- **Greeting Endpoint**: `/hello`
-  - Greets visitors based on their provided name.
-  - If no name is provided, a generic greeting is displayed.
+### `/login`
 
-- **Weather Information Endpoint**: `/hello`
-  - Fetches the visitor's IP address.
-  - Retrieves current weather information based on the visitor's IP using WeatherAPI.
+**Method:** `POST`
 
-## Setup
+This endpoint allows users to log in to the application.
 
-### Prerequisites
+#### Request
 
-- Python 3.x
-- Flask
-- Requests library
-- WeatherAPI API key
+- **URL:** `/login`
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+- **Body:**
+  ```json
+  {
+      "email": "user@example.com",
+      "password": "userpassword"
+  }
+  ```
 
-### Installation
+### Responses
+- **Success (200)**
+
+  ```
+  {
+    "status": "success",
+    "message": "Login successful",
+    "data": {
+        "accessToken": "JWT_TOKEN_HERE",
+        "user": {
+            "userId": "USER_ID",
+            "firstName": "UserFirstName",
+            "lastName": "UserLastName",
+            "email": "user@example.com",
+            "phone": "1234567890"
+        }
+    }
+  }
+  ```
+- **Error (400)**
+
+  ```
+  {
+    "error": "Request must be non-empty JSON"
+  }
+  ```
+
+- **Error (401)**
+
+  ```
+  {
+    "status": "Bad request",
+    "message": "Authentication failed: ERROR_MESSAGE",
+    "statusCode": "401"
+  }
+  ```
+
+### `/register`
+This endpoint allows users to register a new account in the application.
+
+#### Request
+
+- **URL:** `/register`
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+- **Body:**
+
+  ```json
+  {
+    "firstName": "FirstName",
+    "lastName": "LastName",
+    "email": "user@example.com",
+    "password": "userpassword",
+    "phone": "1234567890"
+  }
+  ```
+
+### Responses
+- **Success (201)**
+
+  ```
+  {
+    "status": "success",
+    "message": "Registration successful",
+    "data": {
+        "accessToken": "JWT_TOKEN_HERE",
+        "user": {
+            "userId": "USER_ID",
+            "firstName": "FirstName",
+            "lastName": "LastName",
+            "email": "user@example.com",
+            "phone": "1234567890"
+        }
+    }
+  }
+  ```
+
+- **Error (400)**
+
+  ```
+  {
+      "status": "Bad request",
+      "message": "Registration unsuccessful",
+      "statusCode": "400"
+  }
+  ```
+
+- **Error (422)**
+
+  ```
+  {
+    "errors": [
+        "Field validation errors"
+    ]
+  }
+  ```
+
+### `/organisations`
+This endpoint retrieves all organisations associated with the logged-in user.
+
+#### Request
+
+- **URL:** `/organisations`
+- **Method:** `GET`
+- **Headers:**
+  - `Authorization: Bearer JWT_TOKEN_HERE`
+
+
+### Responses
+- **Success (200)**
+
+  ```
+  {
+    "status": "success",
+    "message": "Request successful",
+    "data": {
+        "organisations": [
+            {
+                "orgId": "ORG_ID",
+                "name": "OrganisationName",
+                "description": "OrganisationDescription"
+            },
+            {
+                "orgId": "ORG_ID",
+                "name": "OrganisationName",
+                "description": "OrganisationDescription"
+            }
+        ]
+    }
+  }
+  ```
+
+- **Error (400)**
+
+  ```
+  {
+    "status": "Bad request",
+    "message": "ERROR_MESSAGE",
+    "statusCode": "400"
+  }
+  ```
+
+### `/organisations/<orgId>`
+This endpoint retrieves a specific organisation's details for the logged-in user.
+
+#### Request
+
+- **URL:** `/organisations/<orgId>`
+- **Method:** `GET`
+- **Headers:**
+  - `Authorization: Bearer JWT_TOKEN_HERE`
+
+
+### Responses
+- **Success (200)**
+
+  ```
+  {
+    "status": "success",
+    "message": "Request successful",
+    "data": {
+        "organisation": {
+            "orgId": "ORG_ID",
+            "name": "OrganisationName",
+            "description": "OrganisationDescription"
+        }
+    }
+  }
+  ```
+
+- **Error (400)**
+
+  ```
+   {
+    "status": "Bad request",
+    "message": "ERROR_MESSAGE",
+    "statusCode": 400"
+  }
+  ```
+
+- **Error (401)**
+
+  ```
+  {
+    "status": "Unauthorized",
+    "message": "Unauthorized to access organisation",
+    "statusCode": "401"
+  }
+  ```
+
+### `/organisations`
+This endpoint allows the logged-in user to create a new organisation.
+
+#### Request
+
+- **URL:** `/organisations`
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+  - `Authorization: Bearer JWT_TOKEN_HERE`
+- **Body:**
+
+  ```json
+  {
+    "name": "OrganisationName",
+    "description": "OrganisationDescription"
+  }
+  ```
+
+### Responses
+- **Success (201)**
+
+  ```
+  {
+    "status": "success",
+    "message": "Organisation created successfully",
+    "data": {
+        "organisation": {
+            "orgId": "ORG_ID",
+            "name": "OrganisationName",
+            "description": "OrganisationDescription"
+        }
+    }
+  }
+  ```
+
+- **Error (422)**
+
+  ```
+  {
+    "errors": {
+        "field": "name",
+        "message": "name cannot be null"
+    }
+  }
+  ```
+
+## Installation
 
 1. Clone the repository:
 
@@ -42,15 +283,7 @@ This Flask application greets visitors based on their provided name (extracted f
     pip install -r requirements.txt
     ```
 
-4. Set up your WeatherAPI key as an environment variable:
 
-    ```
-    export API_KEY='your_weather_api_key'
-    ```
-    On Windows, use:
-    ```
-    set API_KEY='your_weather_api_key'
-    ```
 
 ## Running the Application
 ### Start the Flask development server:
@@ -59,23 +292,13 @@ This Flask application greets visitors based on their provided name (extracted f
 flask run
 ```
 
+### Dependencies
 
-Navigate to http://127.0.0.1:5000/ to see the welcome message.
-
-To get a personalized greeting, navigate to http://127.0.0.1:5000/hello?visitor_name=YourName.
-
-
-## Example Response
-When you visit the /hello endpoint, you will get a JSON response like this:
-
-```
-{
-    "client_ip": "127.0.0.1",
-    "location": "Lagos",
-    "greeting": "Hello, YourName!, the temperature is 27.7 degrees  Celsius in Lagos."
-}
-```
-
+- Python 3.x
+- Flask
+- Flask SQLAlchemy
+- Flask JWT Extended
+- Flask BCrypt
 
 ### Live URL: https://hng-stage-1-weld.vercel.app/api/
 
