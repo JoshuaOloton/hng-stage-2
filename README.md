@@ -300,6 +300,6 @@ flask run
 - Flask JWT Extended
 - Flask BCrypt
 
-### Live URL: https://hng-stage-1-weld.vercel.app/api/
+### Live URL: https://josh-hng11.adaptable.app/
 
 

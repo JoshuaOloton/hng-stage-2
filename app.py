@@ -4,19 +4,20 @@ from api.models import User, Organisation
 from waitress import serve
 from paste.translogger import TransLogger
 import logging
-from dotenv import load_dotenv
 import os
+from flask import jsonify
 
 
 logger = logging.getLogger('waitress')
 logger.setLevel(logging.INFO)
 
-load_dotenv()
 app = create_app('production')
 
 @app.route('/')
 def home():
-    return 'HNG11 Backend Track Stage 2!'
+    return jsonify({
+        "message": "HNG11 Backend Track Stage 2!"
+    })
 
 
 # @app.errorhandler(404)

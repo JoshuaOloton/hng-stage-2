@@ -20,7 +20,7 @@ class User(db.Model):
 
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
-    
+        
     def has_common_organisation(self, user):
         """Check if this user has any common organisation with another user."""
         return any(org in user.organisations for org in self.organisations)
