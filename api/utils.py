@@ -13,13 +13,13 @@ def validate_login_fields(json_body):
     required_fields = ["email", "password"]
 
     for field in required_fields:
-        if field not in json_body or is_empty(json_body[field]):
+        if field not in json_body or is_empty(json_body.get(field)):
             errors.append({
                 "field": field,
                 "message": f"{field} must not be null or empty"
             })
 
-        if json_body.get('field') and not isinstance(json_body[field], str):
+        if json_body.get(field) and not isinstance(json_body.get(field), str):
             errors.append({
                 "field": field,
                 "message": f"{field} must be a string"
@@ -42,13 +42,13 @@ def validate_register_fields(json_body):
     required_fields = ["firstName", "lastName", "email", "password"]
 
     for field in required_fields:
-        if field not in json_body or is_empty(json_body[field]):
+        if field not in json_body or is_empty(json_body.get(field)):
             errors.append({
                 "field": field,
                 "message": f"{field} must not be null or empty"
             })
 
-        if field in json_body and not isinstance(json_body[field], str):
+        if json_body.get(field) and not isinstance(json_body.get(field), str):
             errors.append({
                 "field": field,
                 "message": f"{field} must be a string"
@@ -78,13 +78,21 @@ def validate_register_fields(json_body):
 def validate_organisation_fields(json_body):
     errors = []
 
-    required_fields = ["name", "description"]
+    if "name" not in json_body or is_empty(json_body.get("name")):
+        errors.append({
+            "field": "name",
+            "message": "name must not be null or empty"
+        })
 
-    for field in required_fields:
-        if field not in json_body or is_empty(json_body[field]):
-            errors.append({
-                "field": field,
-                "message": f"{field} must not be null or empty"
-            })
+    if json_body.get("name") and not isinstance(json_body.get("name"), str):
+        errors.append({
+            "field": "name",
+            "message": "name must be a string"
+        })
+    if json_body.get("description") and not isinstance(json_body.get("description"), str):
+        errors.append({
+            "field": "description",
+            "message": "description must be a string"
+        })
 
     return errors

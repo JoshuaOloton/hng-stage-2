@@ -23,6 +23,8 @@ class User(db.Model):
         
     def has_common_organisation(self, user):
         """Check if this user has any common organisation with another user."""
+        print(self.organisations)
+        print(user.organisations)
         return any(org in user.organisations for org in self.organisations)
 
     def to_json(self):

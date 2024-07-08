@@ -19,6 +19,13 @@ def get_user(userId):
         }), 200
     
     user = User.query.get(userId)
+    if not user:
+        return jsonify({
+            "status": "Not Found",
+            "message": "User not found",
+            "statusCode": "404"
+        }), 404
+
     if current_user.has_common_organisation(user):
         return jsonify({
             "status": "success",

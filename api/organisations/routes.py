@@ -3,6 +3,7 @@ from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import Organisation, User
 from api import db
+from api.utils import validate_organisation_fields
 from sqlalchemy import func
 import uuid
 
@@ -71,18 +72,24 @@ def post_org():
     try:
         if not request.data:
             return jsonify({"error": "Request must be non-empty JSON"}), 400
+        
+        json_body = request.json
 
-        name = request.json.get('name')
-        description = request.json.get('description')
+        name = json_body.get('name')
+        description = json_body.get('description')
 
         # validate json body
-        if name is None or name == '':
-           return jsonify({
-               "errors": {
-                   "field": "name",
-                    "message": "name cannot be null"
-               }
-               }), 422
+        # if name is None or name == '':
+        #    return jsonify({
+        #        "errors": {
+        #            "field": "name",
+        #             "message": "name cannot be null"
+        #        }
+        #        }), 422
+
+        errors = validate_organisation_fields(json_body)
+        if len(errors) > 0:
+            return jsonify({"errors": errors}), 422
 
         # get current logged in user
         current_user = User.query.filter_by(email=get_jwt_identity()).first()
