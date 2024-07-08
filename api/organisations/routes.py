@@ -3,6 +3,7 @@ from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import Organisation, User
 from api import db
+from sqlalchemy import func
 import uuid
 
 
@@ -86,6 +87,13 @@ def post_org():
         # get current logged in user
         current_user = User.query.filter_by(email=get_jwt_identity()).first()
 
+        if Organisation.query.filter(func.lower(Organisation.name) == name.lower()).first():
+            return jsonify({
+                "status": "Bad Request",
+                "message": "Organisation already exists",
+                "statusCode": 400
+            }), 400
+
         orgid = str(uuid.uuid4())
         while Organisation.query.get(orgid):
             orgid = str(uuid.uuid4())  # ensure orgid is unique
@@ -141,6 +149,18 @@ def add_user_to_org(orgId):
             return jsonify({
                 "message": "User not found"
             }), 404
+        
+        if organisation is None:
+            return jsonify({
+                "message": "Organisation not found"
+            }), 404
+        
+        if organisation in user.organisations:
+            return jsonify({
+                "status": "Bad Request",
+                "message": "User already belongs to organisation",
+                "statusCode": 400
+            }), 400
         
         user.organisations.append(organisation)
 

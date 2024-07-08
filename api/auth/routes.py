@@ -2,7 +2,7 @@ from . import auth
 from flask import jsonify, request
 from api.models import User, Organisation
 from api import bcrypt, db
-from api.utils import validate_auth_fields
+from api.utils import validate_register_fields, validate_login_fields
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
 import uuid
@@ -15,12 +15,18 @@ def login():
     try:
         if not request.data:
             return jsonify({"error": "Request must be non-empty JSON"}), 400
+        
+        json_body = request.json
 
-        email = request.json.get('email')
-        password = request.json.get('password')
+        email = json_body.get('email')
+        password = json_body.get('password')
 
-        if not email or not password:
-            return jsonify({'error': 'Missing field'})
+        errors = validate_login_fields(json_body)
+        if len(errors) > 0:
+            return jsonify({"errors": errors}), 422
+
+        # if not email or not password:
+        #     return jsonify({'error': 'Missing field'})
 
         existing_user = User.query.filter_by(email=email).first()
 
@@ -40,7 +46,7 @@ def login():
     except Exception as e:
         return jsonify({
             "status": "Bad request",
-            "message": f"Authentication failed: {e}",
+            "message": "Authentication failed",
             "statusCode": "401"
         }), 401
     
@@ -59,7 +65,7 @@ def register():
         password = json_body.get('password')
         phone = json_body.get('phone')
 
-        errors = validate_auth_fields(json_body)
+        errors = validate_register_fields(json_body)
         if len(errors) > 0:
             return jsonify({"errors": errors}), 422
 
