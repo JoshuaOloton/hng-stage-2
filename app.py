@@ -20,10 +20,6 @@ def home():
     })
 
 
-# @app.errorhandler(404)
-# def page_not_found(e):
-#     return '404 Error', 404
-
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'Organisation': Organisation}
