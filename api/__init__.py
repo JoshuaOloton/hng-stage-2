@@ -21,7 +21,7 @@ def create_app(config_name='default'):
     jwt.init_app(app)
 
     from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/api')
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     from .organisations import organisations as orgs_blueprint
     app.register_blueprint(orgs_blueprint, url_prefix='/api')
