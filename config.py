@@ -23,7 +23,7 @@ class ProductionConfig(Config):
     DEBUG = False
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'hng_prod.db')
     # SQLALCHEMY_DATABASE_URI = f"postgresql://josh:{environ.get('POSTGRES_PASSWORD')}@dpg-cq5am3tds78s73curaf0-a.oregon-postgres.render.com/hngstage2_b0fc"
-    SQLALCHEMY_DATABASE_URI = "postgresql://josh-hng11-main-db-0ebe030356e075745:mdMtFCM4erQMbMqbCUBeGsYA5yBPck@user-prod-us-east-2-1.cluster-cfi5vnucvv3w.us-east-2.rds.amazonaws.com:5432/josh-hng11-main-db-0ebe030356e075745"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://josh-hng11-main-db-0ebe030356e075745:{environ.get('POSTGRES_PASSWORD')}@user-prod-us-east-2-1.cluster-cfi5vnucvv3w.us-east-2.rds.amazonaws.com:5432/josh-hng11-main-db-0ebe030356e075745"
 
 config = {
     'default': DevelopmentConfig,
